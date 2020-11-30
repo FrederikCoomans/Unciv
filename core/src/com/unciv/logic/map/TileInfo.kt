@@ -55,6 +55,8 @@ open class TileInfo {
     val longitude: Float
         get() = HexMath.getLongitude(position)
 
+    var settleScore: Float = 0f
+
     fun clone(): TileInfo {
         val toReturn = TileInfo()
         if (militaryUnit != null) toReturn.militaryUnit = militaryUnit!!.clone()
@@ -500,5 +502,60 @@ open class TileInfo {
             civInfo.nation.forestsAndJunglesAreRoads
                     && (terrainFeature == Constants.jungle || terrainFeature == Constants.forest)
                     && isFriendlyTerritory(civInfo)
+
+    fun calculateSettleScore(observingCiv: CivilizationInfo) {
+        val stats = getTileStats(observingCiv)
+        // eventually will take into account ai personalities
+        // eventually will take into account improvements
+
+        // calculate score
+        var score: Float = 0f
+        if (!isLand || this.getOwner() != null) return
+        score += stats.food * (stats.food + 1)/2f // going from 1 food to 2 is not as good as going from 2 food to 3 food
+        score += stats.production // not sure how to value these yet
+        score += stats.gold
+        score += stats.happiness
+        score += stats.science
+        score += stats.culture
+        score += stats.faith
+
+        if (this.hasViewableResource(observingCiv))
+        {
+            val resource = this.getTileResource()
+            if (resource.resourceType == ResourceType.Luxury) {
+                if (observingCiv.hasResource(resource.toString())) {
+                    score += 100
+                }
+                else {
+                    score += 10
+                }
+            }
+            else if (resource.resourceType == ResourceType.Strategic) {
+                if (observingCiv.hasResource(resource.toString())) {
+                    score += 50
+                }
+                else {
+                    score += 20
+                }
+            }
+        }
+
+        // add score to self
+        if (this.isAdjacentToFreshwater) this.settleScore += 5
+        if (this.isAdjacentToRiver()) this.settleScore += 5
+        if (this.isCoastalTile()) this.settleScore += 50
+        // also need to calculate bonus for being next to mountain
+
+        this.settleScore += score
+
+        // add score to neighboring tiles
+        for (distance in 1..3) {
+            for (tile in this.tileMap.getTilesAtDistance(this.position, distance).filter {
+                it.isLand
+            }) {
+                tile.settleScore += score * (4 - distance)
+            }
+        }
+    }
     //endregion
 }
