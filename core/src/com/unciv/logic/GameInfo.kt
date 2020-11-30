@@ -92,7 +92,7 @@ class GameInfo {
             }
             thisPlayer = civilizations[currentPlayerIndex]
             for (tile in this.tileMap.values) { //TODO move this to automation, is here for debug
-                tile.settleScore
+                tile.calculateSettleScore(getCivilization(thisPlayer.civName))
             }
             thisPlayer.startTurn()
         }
