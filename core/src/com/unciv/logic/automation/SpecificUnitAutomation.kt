@@ -157,7 +157,7 @@ object SpecificUnitAutomation {
         val nearbyTileRankings = unit.getTile().getTilesInDistance(7)
                 .associateBy({ it }, { Automation.rankTile(it, unit.civInfo) })
 
-        val possibleCityLocations = unit.getTile().getTilesInDistance(5)
+        val possibleCityLocations = unit.getTile().getTilesInDistance(10)
                 .filter {
                     val tileOwner = it.getOwner()
                     it.isLand && (tileOwner == null || tileOwner == unit.civInfo) // don't allow settler to settle inside other civ's territory
@@ -169,8 +169,13 @@ object SpecificUnitAutomation {
                 .flatMap { it.getTiles().asSequence() }.filter { it.resource != null }
                 .map { it.getTileResource() }.filter { it.resourceType == ResourceType.Luxury }
                 .distinct()
-        val bestCityLocation: TileInfo? = possibleCityLocations
+
+        /*val bestCityLocation: TileInfo? = possibleCityLocations
                 .sortedByDescending { rankTileAsCityCenter(it, nearbyTileRankings, luxuryResourcesInCivArea) }
+                .firstOrNull { unit.movement.canReach(it) }*/
+
+        val bestCityLocation: TileInfo? = possibleCityLocations
+                .sortedByDescending { it.settleScore }
                 .firstOrNull { unit.movement.canReach(it) }
 
         if (bestCityLocation == null) { // We got a badass over here, all tiles within 5 are taken? Screw it, random walk.

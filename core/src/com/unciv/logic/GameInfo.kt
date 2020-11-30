@@ -91,7 +91,8 @@ class GameInfo {
                 turns++
             }
             thisPlayer = civilizations[currentPlayerIndex]
-            for (tile in this.tileMap.values) { //TODO move this to automation, is here for debug
+            for (tile in this.tileMap.values.filter { getCivilization(thisPlayer.civName).exploredTiles.contains(it.position) })
+            { //TODO move this to automation, is here for debug
                 tile.calculateSettleScore(getCivilization(thisPlayer.civName))
             }
             thisPlayer.startTurn()
