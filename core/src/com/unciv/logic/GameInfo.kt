@@ -91,6 +91,9 @@ class GameInfo {
                 turns++
             }
             thisPlayer = civilizations[currentPlayerIndex]
+            for (tile in this.tileMap.values) { //TODO move this to automation, is here for debug
+                tile.settleScore
+            }
             thisPlayer.startTurn()
         }
 

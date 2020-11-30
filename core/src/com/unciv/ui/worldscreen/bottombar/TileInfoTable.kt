@@ -36,6 +36,11 @@ class TileInfoTable(private val viewingCiv :CivilizationInfo) : Table(CameraStag
             table.add(entry.value.toInt().toString().toLabel()).align(Align.left).padRight(10f)
             table.row()
         }
+
+        // TODO Remove Debug
+        table.add(tile.settleScore.toString().toLabel()).align(Align.right)
+        table.row()
+
         return table
     }
 }
