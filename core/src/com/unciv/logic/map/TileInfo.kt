@@ -523,7 +523,7 @@ open class TileInfo {
         {
             val resource = this.getTileResource()
             if (resource.resourceType == ResourceType.Luxury) {
-                if (observingCiv.hasResource(resource.toString())) {
+                if (!observingCiv.hasResource(resource.toString())) {
                     score += 100
                 }
                 else {
@@ -531,7 +531,7 @@ open class TileInfo {
                 }
             }
             else if (resource.resourceType == ResourceType.Strategic) {
-                if (observingCiv.hasResource(resource.toString())) {
+                if (!observingCiv.hasResource(resource.toString())) {
                     score += 50
                 }
                 else {
