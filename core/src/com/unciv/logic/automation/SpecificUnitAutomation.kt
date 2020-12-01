@@ -157,7 +157,7 @@ object SpecificUnitAutomation {
         val nearbyTileRankings = unit.getTile().getTilesInDistance(7)
                 .associateBy({ it }, { Automation.rankTile(it, unit.civInfo) })
 
-        val possibleCityLocations = unit.getTile().getTilesInDistance(10)
+        val possibleCityLocations = unit.getTile().getTilesInDistance(5)
                 .filter {
                     val tileOwner = it.getOwner()
                     it.isLand && (tileOwner == null || tileOwner == unit.civInfo) // don't allow settler to settle inside other civ's territory
@@ -173,10 +173,17 @@ object SpecificUnitAutomation {
         /*val bestCityLocation: TileInfo? = possibleCityLocations
                 .sortedByDescending { rankTileAsCityCenter(it, nearbyTileRankings, luxuryResourcesInCivArea) }
                 .firstOrNull { unit.movement.canReach(it) }*/
+        val bestCityLocation: TileInfo? = if (true) {
+            possibleCityLocations
+                    .sortedByDescending { it.settleScore }
+                    .firstOrNull { unit.movement.canReach(it) }
+        }
+        else {
+            possibleCityLocations
+                    .sortedByDescending { rankTileAsCityCenter(it, nearbyTileRankings, luxuryResourcesInCivArea) }
+                    .firstOrNull { unit.movement.canReach(it) }
+        }
 
-        val bestCityLocation: TileInfo? = possibleCityLocations
-                .sortedByDescending { it.settleScore }
-                .firstOrNull { unit.movement.canReach(it) }
 
         if (bestCityLocation == null) { // We got a badass over here, all tiles within 5 are taken? Screw it, random walk.
             if (UnitAutomation.tryExplore(unit)) return // try to find new areas
