@@ -548,7 +548,7 @@ open class TileInfo {
 
         this.settleScore += score
 
-        // add score to neighboring tiles
+        // add score to neighboring tiles, closer is better
         for (distance in 1..3) {
             for (tile in this.tileMap.getTilesAtDistance(this.position, distance).filter {
                 it.isLand
